@@ -783,6 +783,7 @@ module cice_cap_mod
     ! local variables
     type(ESMF_Clock)                       :: clock
     type(ESMF_State)                       :: importState, exportState
+    type(ESMF_Time)                        :: startTime
     type(ESMF_Time)                        :: currTime
     type(ESMF_TimeInterval)                :: timeStep
 #ifdef CMEPS
@@ -941,7 +942,8 @@ module cice_cap_mod
       file=__FILE__)) &
       return  ! bail out
     
-    call ESMF_ClockGet(clock, currTime=currTime, timeStep=timeStep, rc=rc)
+    call ESMF_ClockGet(clock, startTime=startTime, currTime=currTime, &
+      timeStep=timeStep, rc=rc)
     if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, &
       line=__LINE__, &
       file=__FILE__)) &
@@ -1176,6 +1178,15 @@ module cice_cap_mod
        call t2ugrid_vector(vocn)
        call t2ugrid_vector(ss_tltx)
        call t2ugrid_vector(ss_tlty)
+
+    if (currTime == startTime) then
+     zlvl =  20.000_ESMF_KIND_R8
+     rhoa =   1.225_ESMF_KIND_R8 
+       qa =   0.001_ESMF_KIND_R8
+     Tair = 260.000_ESMF_KIND_R8
+     potT = 260.000_ESMF_KIND_R8
+     call ESMF_LogWrite(trim("Setting uniform values for ice imports"), ESMF_LOGMSG_INFO, rc=dbrc)
+    end if
 
     write(info,*) trim(subname),' --- run phase 2 called --- '
     call ESMF_LogWrite(trim(info), ESMF_LOGMSG_INFO, rc=dbrc)
